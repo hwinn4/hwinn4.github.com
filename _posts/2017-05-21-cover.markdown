@@ -1,0 +1,43 @@
+---
+layout: post
+title: 'Using .cover? with ActiveRecord::enum'
+categories: ruby, methods, enum, range, rails
+---
+This week while doing code review for a colleague, I learned about a new-to-me Ruby method, `.cover?`.
+
+`.cover?` is used to check if an object is within a specified range. This method can be used on a range of strings and numbers. It can also be used on a range created from an `ActiveRecord::Enum` object, which is how my colleague used it.
+
+Let's say you have an enum inside of a Donor class...
+
+{% highlight ruby linenos %}
+class Donor < ActiveRecord::Base
+    enum level: [
+        :supporter,
+        :silver,
+        :elite,
+        :gold
+    ]
+end
+{% endhighlight linenos %}
+
+...and you want to check if any given donor is eligible for a benefit only available to donors who have reached silver level or higher. Create a range from your enum and check if the donor's level falls within that range:
+
+{% highlight ruby %}
+employee1 = Donor.new(level: Donor.levels[:gold])
+employee2 = Donor.new(level: Donor.levels[:supporter])
+
+def is_eligible_for_benefit?(donor)
+    giving_range = (Donor.levels[:silver]..Donor.levels[:gold])
+
+    giving_range.cover?(donor.level)
+end
+
+is_eligible_for_benefit?(employee1)
+# => true
+
+is_eligible_for_benefit?(employee2)
+# => false
+{% endhighlight %}
+
+
+If you want to exclude the upper limit, use `(...)` instead of `(..)` to define your range.
