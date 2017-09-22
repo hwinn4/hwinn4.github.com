@@ -1,0 +1,60 @@
+---
+layout: post
+title: 'Fun times with Ruby Procs'
+categories: ruby, procs, closures, code, fun
+---
+
+What if you regularly want to perform a common operation on a set of objects and sum the results of that operation? Say you have a collection of products, and each product has a price attribute. If you want to know the total price of all products combined, you could do something like this:
+
+{% highlight ruby linenos %}
+    def sum_price_all_product(field)
+        Product.all
+            .map(&field)
+            .compact
+            .reduce(:+)
+    end
+
+    sum = sum_price_all_product(:price)
+{% endhighlight linenos %}
+
+In `sum_price_all_product`, Ruby maps over each product and calls `.price`. The resulting array is then compacted (`nil` values are removed). `reduce` sums all of the elements of the array.
+
+You could even pass a method name as the argument and call that method on each member of the collection, instead of accessing a database attribute:
+
+{% highlight ruby linenos %}
+    def price_with_tax
+        self.price * (1 + self.tax_rate)
+    end
+
+    sum = sum_price_all_product(:price_with_tax)
+{% endhighlight linenos %}
+
+As long as the method is simple, passing a method to our aggregator works just like passing a database attribute. In both cases, the `(&field)` syntax tells Ruby to call `to_proc` on `field` and use that proc as the body of `.map`: `Product.all.map { |p| p.price_with_tax }`
+
+If the method we want to call on each product requires arguments, then simply passing a method name to `sum_price_all_product` won't suffice, and we'll have to do a little extra work. In the case that our method takes in the product as an argument, this handy syntax can be used:
+
+{% highlight ruby linenos %}
+    def price_with_tax(product)
+        product.price * (1 + product.tax_rate)
+    end
+
+    sum = sum_price_all_product(method(:price_with_tax))
+{% endhighlight linenos %}
+
+In this case, Ruby expects to be able to pass the correct number of arguments to `price_with_tax`, even though its parameters are not explicitly mentioned or named. If we used this approach with a parameter-less method or with a method that takes more than 1 argument, Ruby would throw an ArgumentError.
+
+In the event that our aggregation requires calling a method that does take multiple arguments, one of our options is to define a custom proc and pass that proc to `sum_price_all_product`. Here is an adjusted example where `price_with_tax` now takes 2 arguments: product and tax_rate.
+
+{% highlight ruby linenos %}
+    def price_with_tax(product, tax_rate)
+        product.price * (1 + tax_rate)
+    end
+
+    proc = Proc.new { |obj| price_with_tax(obj, 8.875) }
+    sum = sum_price_all_product(method(proc))
+{% endhighlight linenos %}
+
+Because `proc` was defined with 8.875 (hello, New Yorkers!) as the tax rate, the value will be used each time `proc` is called as Ruby maps over the product collection. In each iteration `obj` will equal the current product.
+
+
+
