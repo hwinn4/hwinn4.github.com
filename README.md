@@ -1,7 +1,7 @@
-**serve**
+**Serve**
 jekyll serve
 
-**build**
+**Build**
 jekyll build --watch
 
 **Post name format**
@@ -9,3 +9,6 @@ jekyll build --watch
 
 **Link**
 [minima](https://github.com/jekyll/minima)
+
+**Deploy**
+push to origin, per usual

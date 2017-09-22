@@ -51,7 +51,7 @@ In the event that our aggregation requires calling a method that does take multi
     end
 
     proc = Proc.new { |obj| price_with_tax(obj, 8.875) }
-    sum = sum_price_all_product(method(proc))
+    sum = sum_price_all_product(proc)
 {% endhighlight linenos %}
 
 Because `proc` was defined with 8.875 (hello, New Yorkers!) as the tax rate, the value will be used each time `proc` is called as Ruby maps over the product collection. In each iteration `obj` will equal the current product.
