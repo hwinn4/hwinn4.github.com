@@ -10,5 +10,8 @@ jekyll build --watch
 **Link**
 [minima](https://github.com/jekyll/minima)
 
+**Image**
+![image name]({{ site.url }}/images/image_name.jpg)
+
 **Deploy**
 push to origin, per usual
