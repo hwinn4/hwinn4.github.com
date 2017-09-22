@@ -41,7 +41,7 @@ If the method we want to call on each product requires arguments, then simply pa
     sum = sum_price_all_product(method(:price_with_tax))
 {% endhighlight linenos %}
 
-In this case, Ruby expects to be able to pass the correct number of arguments to `price_with_tax`, even though its parameters are not explicitly mentioned or named. If we used this approach with a parameter-less method or with a method that takes more than 1 argument, Ruby would throw an ArgumentError.
+Ruby expects to be able to pass the correct number of arguments to `price_with_tax`, even though its parameters are not explicitly mentioned or named. The current element of `map` will always be passed as a single argument to the block. If we used this approach with a parameter-less method or with a method that takes more than 1 argument, Ruby would throw an ArgumentError.
 
 In the event that our aggregation requires calling a method that does take multiple arguments, one of our options is to define a custom proc and pass that proc to `sum_price_all_product`. Here is an adjusted example where `price_with_tax` now takes 2 arguments: product and tax_rate.
 
